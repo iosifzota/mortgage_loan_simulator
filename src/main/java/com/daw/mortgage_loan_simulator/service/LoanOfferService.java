@@ -3,6 +3,7 @@ package com.daw.mortgage_loan_simulator.service;
 import org.springframework.stereotype.Service;
 
 import com.daw.mortgage_loan_simulator.model.Dao;
+import com.daw.mortgage_loan_simulator.model.InterestRateCalculator;
 import com.daw.mortgage_loan_simulator.model.LoanOffer;
 import com.daw.mortgage_loan_simulator.model.LoanOfferDao;
 import com.daw.mortgage_loan_simulator.repository.LoanOfferRepo;
@@ -22,8 +23,12 @@ public class LoanOfferService {
         return new LoanOfferDao(repo.all());
     }
 
-    public void calculate(int val, int years) {
-        lastCalculatedOffer = new LoanOffer("test1", val, val / (years * 12), 9.0, 0, years);
+    public void calculate(int val, int years, boolean isFixed) {
+        var name = isFixed ? "Fixed loan" : "Variable rate loan";
+        var rate = new InterestRateCalculator(isFixed).rate();
+        var finalVal = val + val * (rate / 100);
+        var monthlyBill = finalVal / (years * 12);
+        lastCalculatedOffer = new LoanOffer(name, val, monthlyBill, rate, finalVal, years);
     }
 
     public LoanOffer lastCalculated() {

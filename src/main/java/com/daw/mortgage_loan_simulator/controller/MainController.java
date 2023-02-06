@@ -25,8 +25,10 @@ public class MainController {
 
     @GetMapping(path = "/saved", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<LoanOffer> getSavedLoanOffers() {
-        Flux<LoanOffer> f = Flux.fromIterable(service.getDao().all()).delayElements(Duration.ofSeconds(2));
         System.out.println("Called /saved");
+
+        // delayElements simulates some processing.
+        Flux<LoanOffer> f = Flux.fromIterable(service.getDao().all()).delayElements(Duration.ofSeconds(2));
         return f;
     }
 
@@ -41,7 +43,8 @@ public class MainController {
         System.out.println("Called /calculate");
         var val = request.getValue();
         var years = request.getDurationInYears();
-        service.calculate(val, years);
+        var isFixed = request.isFixed();
+        service.calculate(val, years, isFixed);
     }
 
     @GetMapping("/last-calculated")
